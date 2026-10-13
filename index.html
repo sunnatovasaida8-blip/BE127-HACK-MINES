@@ -17,11 +17,17 @@
         .price-tag { display: inline-block; background: rgba(0, 255, 204, 0.15); color: #00ffcc; font-size: 11px; padding: 4px 10px; border-radius: 6px; margin-bottom: 15px; font-weight: bold; }
         .auth-card input { width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 12px; border-radius: 10px; color: #fff; font-size: 14px; text-align: center; margin-bottom: 15px; outline: none; }
         .auth-card input:focus { border-color: #00ffcc; }
-        .auth-card button { width: 100%; background: linear-gradient(135deg, #00ffcc, #0099ff); color: #000; border: none; padding: 12px; border-radius: 10px; font-weight: 800; cursor: pointer; margin-bottom: 15px; }
-        .error-msg { color: #ff4d4d; font-size: 11px; margin-top: 10px; }
+        .auth-card button { width: 100%; background: linear-gradient(135deg, #00ffcc, #0099ff); color: #000; border: none; padding: 12px; border-radius: 10px; font-weight: 800; cursor: pointer; margin-bottom: 10px; }
         
-        .admin-box { font-size: 12px; color: #bbb; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-top: 5px; }
+        .admin-open-btn { background: transparent; border: 1px dashed #ffcc00; color: #ffcc00; padding: 8px; border-radius: 8px; width: 100%; font-size: 11px; cursor: pointer; margin-top: 10px; }
+        .error-msg { color: #ff4d4d; font-size: 11px; margin-top: 5px; }
+        .admin-box { font-size: 12px; color: #bbb; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; margin-top: 10px; }
         .admin-box a { color: #00ffcc; text-decoration: none; font-weight: bold; }
+
+        /* Admin Panel Modal */
+        .admin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(9, 5, 20, 0.95); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; }
+        .admin-card { width: 100%; max-width: 340px; background: rgba(30, 20, 55, 0.95); border: 1px solid #ffcc00; border-radius: 20px; padding: 25px; text-align: center; }
+        .code-display { background: rgba(0, 255, 204, 0.1); border: 2px dashed #00ffcc; padding: 12px; border-radius: 10px; font-size: 18px; font-weight: bold; color: #00ffcc; margin: 15px 0; letter-spacing: 2px; }
 
         /* Asosiy Ilova */
         .container { width: 100%; max-width: 380px; background: rgba(30, 20, 55, 0.75); backdrop-filter: blur(15px); border: 1px solid rgba(255, 215, 0, 0.2); border-radius: 20px; padding: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.7); }
@@ -46,19 +52,32 @@
 </head>
 <body>
 
-    <!-- VIP KOD KIRITISH EKRANI (1 SOATGA AMAL QILADI) -->
+    <!-- VIP KOD KIRITISH EKRANI -->
     <div id="authModal" class="auth-modal">
         <div class="auth-card">
             <h2>🔐 1 SOATLIK VIP ACCESS</h2>
-            <p>Ilovadan foydalanish uchun 1 soatlik aktivatsiya kodini kiriting.</p>
+            <p>Ilovadan foydalanish uchun kodni kiriting.</p>
             <span class="price-tag">Narxi: 25,000 UZS</span>
-            <input type="text" id="vipCodeInput" placeholder="1 soatlik kodni kiriting...">
+            <input type="text" id="vipCodeInput" placeholder="Kodni kiriting...">
             <button onclick="verifyCode()">FAOLLASHTIRISH</button>
             <div id="errorMsg" class="error-msg"></div>
             
             <div class="admin-box">
-                Kod sotib olish uchun: <a href="https://t.me/ZYNEX2_x27" target="_blank">@ZYNEX2_x27</a>
+                Kod sotib olish: <a href="https://t.me/ZYNEX2_x27" target="_blank">@ZYNEX2_x27</a>
             </div>
+            
+            <button class="admin-open-btn" onclick="openAdminPanel()">👑 Admin Panelni ochish</button>
+        </div>
+    </div>
+
+    <!-- ADMIN PANEL MODALI (O'zing uchun ichida chiqadi) -->
+    <div id="adminModal" class="admin-modal">
+        <div class="admin-card">
+            <h2 style="color: #ffcc00;">👑 ADMIN PANEL</h2>
+            <p style="font-size: 12px; color: #ccc;">Hozirgi faol 1 soatlik kod:</p>
+            <div class="code-display" id="currentCodeBox">Yuklanmoqda...</div>
+            <button onclick="generateNewCode()" style="background: linear-gradient(135deg, #ffcc00, #ff6600); color: #000; border:none; padding:12px; border-radius:10px; font-weight:bold; width:100%; cursor:pointer; margin-bottom:10px;">YANGI KOD YARATISH 🔄</button>
+            <button onclick="closeAdminPanel()" style="background: rgba(255,255,255,0.1); color: #fff; border:none; padding:10px; border-radius:10px; width:100%; cursor:pointer;">Yopish</button>
         </div>
     </div>
 
@@ -91,12 +110,10 @@
     </div>
 
     <script>
-        // Har 1 soatda (3600000 millisekund) kodning amal qilish muddatini tekshiramiz
         window.onload = function() {
             const loginTime = localStorage.getItem('be127_login_time');
             const currentTime = new Date().getTime();
             
-            // Agar 1 soat (3600000 ms) o'tmagan bo'lsa, ilovani ochamiz
             if(loginTime && (currentTime - loginTime < 3600000)) {
                 document.getElementById('authModal').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
@@ -107,18 +124,36 @@
 
         function verifyCode() {
             const inputCode = document.getElementById('vipCodeInput').value.trim();
-            
-            // Brauzer localStorage orqali admin paneldan olingan oxirgi kodni tekshiradi
             const activeAdminCode = localStorage.getItem('admin_current_code') || 'BE127VIP';
 
             if(inputCode === activeAdminCode && inputCode !== "") {
                 localStorage.setItem('be127_vip_active', 'true');
-                localStorage.setItem('be127_login_time', new Date().getTime()); // Hozirgi vaqtni saqlaymiz
+                localStorage.setItem('be127_login_time', new Date().getTime());
                 document.getElementById('authModal').style.display = 'none';
                 document.getElementById('mainApp').style.display = 'block';
             } else {
-                document.getElementById('errorMsg').innerText = "Kod noto'g'ri yoki eskirgan! Admindan yangi kod oling.";
+                document.getElementById('errorMsg').innerText = "Noto'g'ri kod! Admindan oling.";
             }
+        }
+
+        function openAdminPanel() {
+            let savedCode = localStorage.getItem('admin_current_code');
+            if(!savedCode) {
+                savedCode = "BE127-" + Math.floor(1000 + Math.random() * 9000);
+                localStorage.setItem('admin_current_code', savedCode);
+            }
+            document.getElementById('currentCodeBox').innerText = savedCode;
+            document.getElementById('adminModal').style.display = 'flex';
+        }
+
+        function closeAdminPanel() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        function generateNewCode() {
+            const randomCode = "BE127-" + Math.floor(1000 + Math.random() * 9000);
+            localStorage.setItem('admin_current_code', randomCode);
+            document.getElementById('currentCodeBox').innerText = randomCode;
         }
 
         let selectedMines = 1;
@@ -133,7 +168,7 @@
             if(!gridContainer) return;
             gridContainer.innerHTML = '';
             for (let i = 0; i < 25; i++) {
-                const cell = document.createElement('div');
+                let cell = document.createElement('div');
                 cell.classList.add('cell');
                 cell.dataset.index = i;
                 gridContainer.appendChild(cell);
