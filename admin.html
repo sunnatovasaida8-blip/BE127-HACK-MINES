@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BE127 - Admin Panel</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; }
+        body { background: #090514; color: #fff; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 15px; }
+        .admin-card { width: 100%; max-width: 360px; background: rgba(30, 20, 55, 0.9); border: 1px solid #ffcc00; border-radius: 20px; padding: 25px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.8); }
+        h2 { color: #ffcc00; margin-bottom: 15px; font-size: 20px; }
+        p { font-size: 13px; color: #ccc; margin-bottom: 20px; }
+        .code-display { background: rgba(0, 255, 204, 0.1); border: 2px dashed #00ffcc; padding: 15px; border-radius: 12px; font-size: 22px; font-weight: bold; color: #00ffcc; margin-bottom: 20px; letter-spacing: 2px; }
+        button { width: 100%; background: linear-gradient(135deg, #ffcc00, #ff6600); color: #000; border: none; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 15px; cursor: pointer; transition: 0.2s; }
+        button:active { transform: scale(0.97); }
+        .success-text { color: #00ffcc; font-size: 12px; margin-top: 12px; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-card">
+        <h2>👑 ADMIN PANEL</h2>
+        <p>Hozirgi 1 soatlik faol kod:</p>
+        
+        <div class="code-display" id="currentCodeBox">Yuklanmoqda...</div>
+        
+        <button onclick="generateNewCode()">YANGI KOD YARATISH 🔄</button>
+        <div class="success-text" id="msgBox"></div>
+    </div>
+
+    <script>
+        // Sahifa ochilganda mavjud kodni ko'rsatish
+        window.onload = function() {
+            let savedCode = localStorage.getItem('admin_current_code');
+            if(!savedCode) {
+                savedCode = "BE127-" + Math.floor(1000 + Math.random() * 9000);
+                localStorage.setItem('admin_current_code', savedCode);
+            }
+            document.getElementById('currentCodeBox').innerText = savedCode;
+        }
+
+        // Yangi tasodifiy kod yaratish tugmasi
+        function generateNewCode() {
+            const randomCode = "BE127-" + Math.floor(1000 + Math.random() * 9000);
+            localStorage.setItem('admin_current_code', randomCode);
+            document.getElementById('currentCodeBox').innerText = randomCode;
+            document.getElementById('msgBox').innerText = "Yangi kod muvaffaqiyatli faollashtirildi!";
+            
+            setTimeout(() => {
+                document.getElementById('msgBox').innerText = "";
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
