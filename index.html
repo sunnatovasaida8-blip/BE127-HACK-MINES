@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BE127 - Mines VIP Predictor</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+
+    <!-- VIP KOD KIRITISH EKRANI (LOCKED) -->
+    <div id="authModal" class="auth-modal">
+        <div class="auth-card">
+            <h2>🔐 BE127 VIP ACCESS</h2>
+            <p>Ilovadan foydalanish uchun sotib olingan aktivatsiya kodini kiriting.</p>
+            <span class="price-tag">Narxi: 25,000 UZS</span>
+            <input type="text" id="vipCodeInput" placeholder="Kodni kiriting (masalan: BE127)...">
+            <button onclick="verifyCode()">FAOLLASHTIRISH</button>
+            <div id="errorMsg" class="error-msg"></div>
+        </div>
+    </div>
+
+    <!-- ASOSIY ILOVA (Yashiringan bo'ladi) -->
+    <div class="container" id="mainApp" style="display: none;">
+        <header class="header">
+            <div class="logo">BE127 <span class="badge">MINES VIP</span></div>
+            <div class="status-bar"><span class="dot"></span> Online</div>
+        </header>
+
+        <div class="settings-card">
+            <label>Minalar sonini tanlang:</label>
+            <div class="mines-select">
+                <button class="mine-btn active" onclick="setMines(1)">1</button>
+                <button class="mine-btn" onclick="setMines(3)">3</button>
+                <button class="mine-btn" onclick="setMines(5)">5</button>
+                <button class="mine-btn" onclick="setMines(7)">7</button>
+            </div>
+        </div>
+
+        <div class="grid-container" id="minesGrid"></div>
+
+        <div class="stats-info">
+            <span>Aniqlik: <strong id="accuracy">99.2%</strong></span>
+            <span>Promo: <strong>BE127</strong></span>
+        </div>
+
+        <button class="signal-btn" onclick="getSignal()">SIGNAL OLISH 💎</button>
+        <div class="footer">POWERD BY THEEAGLE</div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
